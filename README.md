@@ -12,15 +12,49 @@ By the end of this, students should be able to:
 
 ## Instructions
 
-Include explict step-by-step instructions about the goals of the assignment, and how to run the code.
+### Create an Albums resource
 
-Make sure to wrap section of code in appropriate markdown like `ls -al`, and denote the language as below for longer sections:
+Create an Album resource. Album has a title and genre.  
 
-```ruby
-x = 2
-y = 3
-puts x + y
 ```
+rails g scaffold Album title:string genre:string
+```
+
+Migrate.  
+
+```
+rake db:migrate
+
+```
+
+Seed.  
+
+```
+Album.delete_all
+
+nevermind = Album.create!(title: "Nevermind", genre: 'rock')
+sea_change = Album.create!(title: "Sea Change", genre: 'jazz')
+
+```
+
+```
+rake db:seed
+```
+
+#### Before Action
+
+Open up the Album controller and take a look at the before_action. 
+A before action is run *before* actions, yep thats right. It does what it says! 
+
+Here we are just removing duplicate code from the actions. Note how many actions,(show, edit, update and destroy), need to set the @album instance variable given an id from the params hash.  
+
+[Rails Guide for Filters](http://guides.rubyonrails.org/action_controller_overview.html#filters)
+[API Dock for before_filter](http://apidock.com/rails/ActionController/Filters/ClassMethods/before_filter)
+
+Another very common use of a before filter is to check that a user is logged in.
+
+Or, as we'll see later, to set the outer resource when using nested resources.
+
 
 ## Bonus (Optional Section)
 
