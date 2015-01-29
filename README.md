@@ -6,9 +6,11 @@
 
 By the end of this, students should be able to:
 
-- Objective 1
-- Objective 2
-- Objective 3
+- Create a before_filter
+- Add Model validations.
+- Learn about Nested Resources.
+- Practice creating one to many relationships.
+- Learn about many to many relationships.
 
 ## Instructions
 
@@ -51,9 +53,85 @@ Here we are just removing duplicate code from the actions. Note how many actions
 [Rails Guide for Filters](http://guides.rubyonrails.org/action_controller_overview.html#filters)
 [API Dock for before_filter](http://apidock.com/rails/ActionController/Filters/ClassMethods/before_filter)
 
-Another very common use of a before filter is to check that a user is logged in.
+Another very common use of a before filter is to check that a user is logged in. Or, as we'll see later, to set the outer resource when using nested resources.
 
-Or, as we'll see later, to set the outer resource when using nested resources.
+### Create Model Validations
+
+Validation are part of ActiveRecord. They prevent the creation of invalid models in the database. 
+
+Add validations to the Album model.  
+
+```
+  #  defining a class constant named GENRES
+  # Album::GENRES to access outside of the class
+  GENRES = %w{rock rap country jazz ska dance}
+
+  validates :title, presence: true
+  validates :genre, inclusion: {in: GENRES}
+```
+
+This is creating two validations. The first will make sure that an album **without** a title can **not** exist. The second validation will make sure that the genre must be one of rock, rap, country, jazz, ska or dance.
+
+Go ahead try to create an invalid Album in the rails console. *I dare ya*.
+
+```
+album = Album.new
+album.save
+```
+
+Notice how the database transaction was **Rolled Back.** when we tried to save the album in the DB.    
+
+Lets look at the errors.   
+```
+album.errors
+```  
+```
+album.errors.full_messages
+```
+
+We'll see the that the title cant be blank and the genre is not valid. *Cool, huh*  
+["Title can't be blank", "Genre is not included in the list"]
+
+
+##### Try to create an invalid Album using the UI
+How'd that happen? *Well, look at the form partial in app/views/albums/_form.html.erb*
+
+```
+<% if @album.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@album.errors.count, "error") %> prohibited this album from being saved:</h2>
+
+      <ul>
+      <% @album.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+```
+
+Here's the magic to display errors!
+
+This will display the number of errors and walk through the array of error messages.
+
+#### Change the error message
+
+In the album model.  
+
+```
+  validates :genre, inclusion: {in: GENRES, message: "is Invalid"}
+```
+
+#### Only allow the user to choose a valid genre.  
+
+In the album form partial, use a select drop down for genre:  
+
+```
+ <%= f.select :genre,
+    Album::GENRES,
+    prompt: "Pick one" %>
+```
 
 
 ## Bonus (Optional Section)

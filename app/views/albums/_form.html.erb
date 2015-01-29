@@ -17,7 +17,9 @@
   </div>
   <div class="field">
     <%= f.label :genre %><br>
-    <%= f.text_field :genre %>
+    <%= f.select :genre,
+    Album::GENRES,
+    prompt: "Pick one" %>
   </div>
   <div class="actions">
     <%= f.submit %>
