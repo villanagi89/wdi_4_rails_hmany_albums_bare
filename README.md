@@ -349,7 +349,7 @@ By default the Artist will be a union member. *Add this to the Artist migraiton*
      t.boolean :union_member, default: true
 ```
 
-Migrate to add the artists table to the database.
+Migrate to add the artists table to the database.  
 ```
 rake db:migrate
 ```
@@ -364,11 +364,107 @@ And each Artist MAY be associated with **One or more Songs.**
 
 This is a **Many to Many** relationship between Songs and Artists. 
 
-Lets draw out the relationships as they will exist in the DB.
 
 
-#### Create SongRemove the 
+#### Create SongContribution model.
 
+Create a **JOIN** model that will represent the **Many to Many** relationship between Songs and Artists.  
+
+```
+rails g migration CreateSongContribution song:belongs_to artist:belongs_to role:string
+```
+
+**Lets draw out the relationships as they will exist in the DB.**
+
+Remove the artist field from Songs **because the this Artist to Song relationship will now be kept in the Join Table/Model.** *Don't forget to remove the artist attribute from the Song views.*  
+
+
+```
+rails g migration RemoveArtistFromSongs artist:string
+```
+
+Run the migrations. *May have to drop/create/migrate the DB*
+
+```
+rake db:migrate
+```
+
+Create a Join model for song contributions in app/models/song_contribution.rb  *Notice the namimg convention here*
+
+```
+class SongContribution < ActiveRecord::Base
+
+  belongs_to :artist
+  belongs_to :song
+
+end
+
+```
+
+Add song contributions to the artist model.  ** We will use a through relationship to find the artist's songs!**
+
+```
+class Artist < ActiveRecord::Base
+
+  has_many :song_contributions
+  has_many :songs, through: :song_contributions
+end
+
+```
+
+Add song contributions to the song model.  ** We will use a through relationship to find the song's artists!**
+
+```
+class Song < ActiveRecord::Base
+  belongs_to :album
+
+  has_many :song_contributions
+  has_many :artists, through: :song_contributions
+end
+```
+
+Add seed data.  
+
+```
+Album.delete_all
+
+nevermind = Album.create!(title: "Nevermind", genre: 'rock')
+sea_change = Album.create!(title: "Sea Change", genre: 'jazz')
+
+golden_age = sea_change.songs.create!(title: 'golden age', price: 1.99, duration: 215)
+lost_cause = sea_change.songs.create!(title: 'lost Cause', price: 4.99, duration: 182)
+lonesome_tears = sea_change.songs.create!(title: 'lonesome Tears', price: 2.99, duration: 1\
+56)
+
+lithium = nevermind.songs.create!(title: 'lithium', duration: 193, price: 1.99)
+come_as = nevermind.songs.create!(title: 'come as you are', duration: 177, price: 1.49)
+
+Artist.delete_all
+SongContribution.delete_all
+
+kurt = Artist.create!(name: 'Kurt Cobain', dob: DateTime.parse("February 20, 1967") )
+dave = Artist.create!(name: 'Dave Grohl', dob: DateTime.parse("January 14, 1969"))
+beck = Artist.create!(name: 'Beck Hansen', dob: DateTime.parse("July 8, 1970"))
+
+kurt.songs << lithium
+kurt.songs << come_as
+
+dave.songs << lithium
+
+beck.songs << golden_age
+beck.songs << lost_cause
+beck.songs << lonesome_tears
+```
+
+#### In the Rails console.
+- Take a look at each Artist's songs.
+- Take a look at each Song's artists.
+
+#### In the UI
+- Take a look at each Artist's songs.
+- Take a look at each Song's artists.
+
+Oops, some work needs to be done here, ay!
 
 
 
