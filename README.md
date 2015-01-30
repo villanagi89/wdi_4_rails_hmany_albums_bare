@@ -219,7 +219,100 @@ in the Songs index view.
  </ul>
 ```
 
-## Create a Song nested resource.
+## Create a new Song nested resource.
+
+In the Songs controller.  
+
+```
+ def new
+    @album = Album.find(params[:album_id])
+    @song = @album.songs.new
+  end
+
+```
+
+Create a new view.  
+
+```
+  <h1>Songs for Album <%= link_to(@album.title, album_path(@album)) %></h1>
+  <%= render 'form' %>
+```
+
+Create a form partial for the Song resource.   
+
+```
+	<%= form_for [@album, @song] do |f| %>
+	<%= render 'shared/errors', object: @song %>
+	<p>
+	  <%= f.label :title %>
+	  <%= f.text_field :title, autofocus: true %>
+	</p>
+	<p>
+	  <%= f.label :artist %>
+	  <%= f.text_field :artist %>
+	</p>
+	<p>
+	  <%= f.label :duration %>
+	  <%= f.number_field :duration %>
+	</p>
+	<p>
+	  <%= f.label :price %>
+	  <%= f.text_field :price %>
+	</p>
+
+	<%= f.submit %>
+	| <%= link_to "Cancel", albums_path %>
+	<% end %>
+
+```
+
+Create a shared errors partial in app/views/shared/_errors.html.erb.   
+
+```
+	<% if object.errors.any? %>
+	<div id="error_explanation">
+	  <h2><%= pluralize(object.errors.count, "error") %> prohibited this object from being saved:</h2>
+
+  <ul>
+    <% object.errors.full_messages.each do |message| %>
+    <li><%= message %></li>
+    <% end %>
+  </ul>
+  </div>
+ <% end %>
+```
+
+Create a create action in the Songs Controller.  
+
+```
+  def create
+    @album = Album.find(params[:album_id])
+    @song = @album.songs.new(songs_params)
+
+    if @song.save
+      redirect_to album_songs_path(@album)
+    else
+      render :new
+    end
+  end
+
+  private
+
+  def songs_params
+    params.require(:song).permit(:title, :artist, :duration, :price)
+  end
+
+```
+
+
+## Update the Flash
+The flash is a hash structure that is used to display messages via the UI. It will only be avalaible for the next HTTP request.
+
+[Rails flash](http://guides.rubyonrails.org/action_controller_overview.html#the-flash)
+
+Add a notice to the UI that a song was created.
+
+
 
 
 

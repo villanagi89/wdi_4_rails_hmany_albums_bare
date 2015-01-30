@@ -1,0 +1,22 @@
+<%= form_for [@album, @song] do |f| %>
+<%= render 'shared/errors', object: @song %>
+<p>
+  <%= f.label :title %>
+  <%= f.text_field :title, autofocus: true %>
+</p>
+<p>
+  <%= f.label :artist %>
+  <%= f.text_field :artist %>
+</p>
+<p>
+  <%= f.label :duration %>
+  <%= f.number_field :duration %>
+</p>
+<p>
+  <%= f.label :price %>
+  <%= f.text_field :price %>
+</p>
+
+<%= f.submit %>
+| <%= link_to "Cancel", albums_path %>
+<% end %>
