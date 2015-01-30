@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150130042826) do
+ActiveRecord::Schema.define(version: 20150130045109) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,9 +31,17 @@ ActiveRecord::Schema.define(version: 20150130042826) do
     t.datetime "updated_at",                  null: false
   end
 
+  create_table "artists_songs", id: false, force: :cascade do |t|
+    t.integer "song_id",    null: false
+    t.integer "artist_id",  null: false
+    t.string  "instrument"
+  end
+
+  add_index "artists_songs", ["artist_id", "song_id"], name: "index_artists_songs_on_artist_id_and_song_id", using: :btree
+  add_index "artists_songs", ["song_id", "artist_id"], name: "index_artists_songs_on_song_id_and_artist_id", using: :btree
+
   create_table "songs", force: :cascade do |t|
     t.string   "title"
-    t.string   "artist"
     t.integer  "duration"
     t.decimal  "price"
     t.integer  "album_id"
