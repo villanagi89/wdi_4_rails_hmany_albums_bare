@@ -1,0 +1,6 @@
+<h2><%= pluralize(@songs.count, 'song') %></h2>
+<ul>
+  <% @songs.each do |song| %>
+  <li><%= song.title %></li>
+  <% end %>
+</ul>

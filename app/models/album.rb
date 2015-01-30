@@ -5,4 +5,6 @@ class Album < ActiveRecord::Base
 
   validates :title, presence: true
   validates :genre, inclusion: {in: GENRES, message: "is Invalid"}
+
+  has_many :songs, dependent: :destroy
 end

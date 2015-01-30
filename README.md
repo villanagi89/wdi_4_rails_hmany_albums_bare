@@ -12,9 +12,8 @@ By the end of this, students should be able to:
 - Practice creating one to many relationships.
 - Learn about many to many relationships.
 
-## Instructions
 
-### Create an Albums resource
+## Create an Albums resource
 
 Create an Album resource. Album has a title and genre.  
 
@@ -43,7 +42,7 @@ sea_change = Album.create!(title: "Sea Change", genre: 'jazz')
 rake db:seed
 ```
 
-#### Before Action
+## Before Action
 
 Open up the Album controller and take a look at the before_action. 
 A before action is run *before* actions, yep thats right. It does what it says! 
@@ -55,7 +54,7 @@ Here we are just removing duplicate code from the actions. Note how many actions
 
 Another very common use of a before filter is to check that a user is logged in. Or, as we'll see later, to set the outer resource when using nested resources.
 
-### Create Model Validations
+## Create Model Validations
 
 Validation are part of ActiveRecord. They prevent the creation of invalid models in the database. 
 
@@ -133,10 +132,96 @@ In the album form partial, use a select drop down for genre:
     prompt: "Pick one" %>
 ```
 
+## Create a nested resource for Songs.
 
-## Bonus (Optional Section)
+Lets create a nested resource for songs. Another words, each song MUST be part of an album. We can **NEVER** access a Song without specifying it's containing Album.
 
-If you're looking for extra challenge or practice once you've completed the above, try to...
+Create a Song model.  
+
+```
+rails g model Song title:string artist:string duration:integer price:decimal album:belongs_to
+
+rake db:migrate
+```
+
+Create some seed data for Songs.  
+
+```
+Song.delete_all
+sea_change.songs.create!(title: 'golden age', artist: "beck", price: 1.99, dura\
+tion: 215)
+sea_change.songs.create!(title: 'lost Cause', artist: "beck", price: 4.99, dura\
+tion: 182)
+sea_change.songs.create!(title: 'lonesome Tears', artist: "beck", price: 2.99, \
+duration: 156)
+
+nevermind.songs.create!(title: 'lithium', artist: 'nirvana', duration: 193, pri\
+ce: 1.99)
+nevermind.songs.create!(title: 'come as you are', artist: 'nirvana', duration: \
+177, price: 1.49)
+```
+
+Create a has_many in the Album model.   
+
+```
+  has_many :songs, dependent: :destroy
+
+```
+
+Seed the song data.  
+```
+rake db:seed
+```
+
+Take a look at each album and it's songs in the rails console.
+
+## Create views for the Song nested resource.
+
+In routes.rb  
+```
+resources :albums do
+    resources :songs
+end
+```
+
+This will create **Nested Routes**.   
+
+```
+rake routes
+```
+
+The route for each song has the id of the album that the song is part of.
+
+
+```
+class SongsController < ApplicationController
+
+  def index
+  	
+    @album = Album.find(params[:album_id])
+    @songs = @album.songs
+  end
+end
+```
+
+Get the id of the album that is in the URL's resource path and retrieve an Album from the DB.
+
+Show ONLY the songs from this album.
+
+in the Songs index view.  
+
+```
+ <h2><%= pluralize(@songs.count, 'song') %></h2>
+ <ul>
+  <% @songs.each do |song| %>
+  <li><%= song.title %></li>
+  <% end %>
+ </ul>
+```
+
+## Create a Song nested resource.
+
+
 
 ## Notes
 
