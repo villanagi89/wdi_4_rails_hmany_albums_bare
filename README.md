@@ -335,6 +335,39 @@ Show the flash in the layout.
 <% end %>
 ```
 
+## Create an Artist scaffold
+
+```
+rails g scaffold Artist name union_member:boolean dob:datetime
+```
+
+Now we have an Artist that can have a name and may be a union_member and has a Date of Birth.
+
+By default the Artist will be a union member. *Add this to the Artist migraiton*  
+
+```
+     t.boolean :union_member, default: true
+```
+
+Migrate to add the artists table to the database.
+```
+rake db:migrate
+```
+
+Create an artist in the rails console. And create, update and delete the Artist in the UI.
+
+## Make a SongsArtist Join Table.
+
+Now we are going to associate each Song not only with an Album, *remember each Song MUST be part of an album*, but each Song will be associated with **One or more Artists**. 
+
+And each Artist MAY be associated with **One or more Songs.**
+
+This is a **Many to Many** relationship between Songs and Artists. 
+
+Lets draw out the relationships as they will exist in the DB.
+
+
+#### Create SongRemove the 
 
 
 
