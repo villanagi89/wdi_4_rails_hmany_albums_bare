@@ -15,7 +15,7 @@ class SongsController < ApplicationController
     @song = @album.songs.new(songs_params)
 
     if @song.save
-      redirect_to album_songs_path(@album)
+      redirect_to album_songs_path(@album), notice: "You've created a new Song"
     else
       render :new
     end

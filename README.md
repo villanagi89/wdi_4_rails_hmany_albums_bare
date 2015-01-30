@@ -312,18 +312,30 @@ The flash is a hash structure that is used to display messages via the UI. It wi
 
 Add a notice to the UI that a song was created.
 
+```
+
+    if @song.save
+      redirect_to album_songs_path(@album), notice: "You've created a new Song"
+    else
+      render :new
+    end
+
+```
+
+The notice will set a key in the flash hash.   
+flash[:notice] = "You've created a new Songs"
+
+Show the flash in the layout.  
+
+```
+<% if flash[:notice].present? %>
+  <p>
+    <%= flash[:notice] %>
+  </p>
+<% end %>
+```
 
 
 
 
-## Notes
 
-Gotcha's and extra information
-
-## Additional Resources
-
-List additional related resources such as videos, blog posts and official documentation.
-
-- Item 1
-- Item 2
-- Item 3
