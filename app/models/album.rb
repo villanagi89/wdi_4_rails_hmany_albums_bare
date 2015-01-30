@@ -5,6 +5,6 @@ class Album < ActiveRecord::Base
   GENRES = %W{ rock rap country jazz ska dance}
 
   validates :title, presence: true
-  validates :genre, inclusion: {in: GENRES}
+  validates :genre, inclusion: {in: GENRES, message: 'is Invalid'}
 end
 
