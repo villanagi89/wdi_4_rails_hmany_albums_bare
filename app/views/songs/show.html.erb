@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @song.title %>
+</p>
+
+<p>
+  <strong>Duration:</strong>
+  <%= @song.duration %>
+</p>
+
+<p>
+  <strong>Price:</strong>
+  <%= number_to_currency(@song.price) %>
+</p>
+
+<%# = link_to 'Edit', edit_artist_path(@song) %>
+<%= link_to 'Back', album_songs_path(@album) %>

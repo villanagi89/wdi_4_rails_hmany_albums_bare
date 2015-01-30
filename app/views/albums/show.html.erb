@@ -9,6 +9,6 @@
   <strong>Genre:</strong>
   <%= @album.genre %>
 </p>
-
+<%= link_to 'Songs', album_songs_path(@album) %> |
 <%= link_to 'Edit', edit_album_path(@album) %> |
 <%= link_to 'Back', albums_path %>

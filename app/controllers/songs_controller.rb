@@ -5,6 +5,11 @@ class SongsController < ApplicationController
     @songs = @album.songs
   end
 
+  def show
+    @album = Album.find(params[:album_id])
+    @song = @album.songs.find(params[:id])
+  end
+
   def new
     @album = Album.find(params[:album_id])
     @song = @album.songs.new
