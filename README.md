@@ -335,6 +335,127 @@ Show the flash in the layout.
 <% end %>
 ```
 
+## Create an Artist scaffold
+
+```
+rails g scaffold Artist name union_member:boolean dob:datetime
+```
+
+Now we have an Artist that can have a name and may be a union_member and has a Date of Birth.
+
+By default the Artist will be a union member. *Add this to the Artist migraiton*  
+
+```
+     t.boolean :union_member, default: true
+```
+
+Migrate to add the artists table to the database.
+```
+rake db:migrate
+```
+
+Create an artist in the rails console. And create, update and delete the Artist in the UI.
+
+## Make a SongsArtist Join Table.
+
+Now we are going to associate each Song not only with an Album, *remember each Song MUST be part of an album*, but each Song will be associated with **One or more Artists**. 
+
+And each Artist MAY be associated with **One or more Songs.**
+
+This is a **Many to Many** relationship between Songs and Artists. 
+
+Lets draw out the relationships as they will exist in the DB.
+
+
+Create the Join Table.  
+```
+rails g migration CreateJoinTable songs artists
+```
+
+Add an instrument to the Join table.  In the migration.  
+
+```
+ create_join_table :songs, :artists do |t|
+      t.index [:song_id, :artist_id]
+      t.index [:artist_id, :song_id]
+      t.string :instrument
+ end
+```
+
+Remove old artist column from the Songs table. We don't need it now.  
+
+```
+rails g migration RemoveArtistFromSongs artist:string
+```
+
+Run the migrations.  
+```
+rake db:migrate
+```
+
+Create the Join Model in app/models/artists_songs.rb.
+
+```
+class ArtistsSongs < ActiveRecord::Base
+  belongs_to :artist
+  belongs_to :song
+end
+```
+
+Update the Artist model.  
+
+```
+class Artist < ActiveRecord::Base
+  has_many :artists_songs, class: ArtistsSongs
+  has_many :songs, through: :artists_songs
+end
+```
+
+
+Update the Song model.  
+
+```
+class Song < ActiveRecord::Base
+  belongs_to :album
+
+  has_many :artists_songs, class: ArtistsSongs
+  has_many :artists, through: :artists_songs
+end
+```
+
+Update the seeds.  
+
+```
+Album.delete_all
+
+nevermind = Album.create!(title: "Nevermind", genre: 'rock')
+sea_change = Album.create!(title: "Sea Change", genre: 'jazz')
+
+golden_age = sea_change.songs.create!(title: 'golden age', price: 1.99, duration: 215)
+lost_cause = sea_change.songs.create!(title: 'lost Cause', price: 4.99, duration: 182)
+lonesome_tears = sea_change.songs.create!(title: 'lonesome Tears', price: 2.99, duration: 1\
+56)
+
+lithium = nevermind.songs.create!(title: 'lithium', duration: 193, price: 1.99)
+come_as = nevermind.songs.create!(title: 'come as you are', duration: 177, price: 1.49)
+
+Artist.delete_all
+ArtistsSongs.delete_all
+
+kurt = Artist.create!(name: 'Kurt Cobain', dob: DateTime.parse("February 20, 1967") )
+dave = Artist.create!(name: 'Dave Grohl', dob: DateTime.parse("January 14, 1969"))
+beck = Artist.create!(name: 'Beck Hansen', dob: DateTime.parse("July 8, 1970"))
+
+kurt.songs << lithium
+kurt.songs << come_as
+
+dave.songs << lithium
+
+beck.songs << golden_age
+beck.songs << lost_cause
+beck.songs << lonesome_tears
+```
+
 
 
 
