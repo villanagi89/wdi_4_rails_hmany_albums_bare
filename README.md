@@ -349,7 +349,7 @@ By default the Artist will be a union member. *Add this to the Artist migraiton*
      t.boolean :union_member, default: true
 ```
 
-Migrate to add the artists table to the database.
+Migrate to add the artists table to the database.  
 ```
 rake db:migrate
 ```
@@ -364,66 +364,66 @@ And each Artist MAY be associated with **One or more Songs.**
 
 This is a **Many to Many** relationship between Songs and Artists. 
 
-Lets draw out the relationships as they will exist in the DB.
 
 
-Create the Join Table.  
-```
-rails g migration CreateJoinTable songs artists
-```
+#### Create SongContribution model.
 
-Add an instrument to the Join table.  In the migration.  
+Create a **JOIN** model that will represent the **Many to Many** relationship between Songs and Artists.  
 
 ```
- create_join_table :songs, :artists do |t|
-      t.index [:song_id, :artist_id]
-      t.index [:artist_id, :song_id]
-      t.string :instrument
- end
+rails g migration CreateSongContribution song:belongs_to artist:belongs_to role:string
 ```
 
-Remove old artist column from the Songs table. We don't need it now.  
+**Lets draw out the relationships as they will exist in the DB.**
+
+Remove the artist field from Songs **because the this Artist to Song relationship will now be kept in the Join Table/Model.** *Don't forget to remove the artist attribute from the Song views.*  
+
 
 ```
 rails g migration RemoveArtistFromSongs artist:string
 ```
 
-Run the migrations.  
+Run the migrations. *May have to drop/create/migrate the DB*
+
 ```
 rake db:migrate
 ```
 
-Create the Join Model in app/models/artists_songs.rb.
+Create a Join model for song contributions in app/models/song_contribution.rb  *Notice the namimg convention here*
 
 ```
-class ArtistsSongs < ActiveRecord::Base
+class SongContribution < ActiveRecord::Base
+
   belongs_to :artist
   belongs_to :song
+
 end
+
 ```
 
-Update the Artist model.  
+Add song contributions to the artist model.  ** We will use a through relationship to find the artist's songs!**
 
 ```
 class Artist < ActiveRecord::Base
-  has_many :artists_songs, class: ArtistsSongs
-  has_many :songs, through: :artists_songs
+
+  has_many :song_contributions
+  has_many :songs, through: :song_contributions
 end
+
 ```
 
-
-Update the Song model.  
+Add song contributions to the song model.  ** We will use a through relationship to find the song's artists!**
 
 ```
 class Song < ActiveRecord::Base
   belongs_to :album
 
-  has_many :artists_songs, class: ArtistsSongs
-  has_many :artists, through: :artists_songs
+  has_many :song_contributions
+  has_many :artists, through: :song_contributions
 end
 ```
 
-Update the seeds.  
+Add seed data.  
 
 ```
 Album.delete_all
@@ -440,7 +440,7 @@ lithium = nevermind.songs.create!(title: 'lithium', duration: 193, price: 1.99)
 come_as = nevermind.songs.create!(title: 'come as you are', duration: 177, price: 1.49)
 
 Artist.delete_all
-ArtistsSongs.delete_all
+SongContribution.delete_all
 
 kurt = Artist.create!(name: 'Kurt Cobain', dob: DateTime.parse("February 20, 1967") )
 dave = Artist.create!(name: 'Dave Grohl', dob: DateTime.parse("January 14, 1969"))
@@ -456,7 +456,15 @@ beck.songs << lost_cause
 beck.songs << lonesome_tears
 ```
 
+#### In the Rails console.
+- Take a look at each Artist's songs.
+- Take a look at each Song's artists.
 
+#### In the UI
+- Take a look at each Artist's songs.
+- Take a look at each Song's artists.
+
+Oops, some work needs to be done here, ay!
 
 
 
